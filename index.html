@@ -119,6 +119,27 @@
     .context-menu ul li:hover {
         background-color: #f0f0f0;
     }
+    .settings-menu {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 3;
+        display: none;
+    }
+    .settings-menu ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    .settings-menu ul li {
+        padding: 8px 16px;
+        cursor: pointer;
+    }
+    .settings-menu ul li:hover {
+        background-color: #f0f0f0;
+    }
 </style>
 </head>
 <body>
@@ -144,6 +165,14 @@
     <ul>
         <li onclick="showContextMenu(event, 'Open')">Open</li>
         <li onclick="showContextMenu(event, 'Delete')">Delete</li>
+    </ul>
+</div>
+
+<div id="settingsMenu" class="settings-menu">
+    <ul>
+        <li>Option 1</li>
+        <li>Option 2</li>
+        <li>Option 3</li>
     </ul>
 </div>
 
@@ -262,6 +291,22 @@
         desktopIcons.forEach(icon => {
             if (icon.querySelector('img').alt === appName) {
                 icon.remove();
+            }
+        });
+    }
+
+    function showSettingsMenu(event) {
+        event.preventDefault();
+        const settingsMenu = document.getElementById('settingsMenu');
+        settingsMenu.style.left = `${event.clientX}px`;
+        settingsMenu.style.top = `${event.clientY}px`;
+        settingsMenu.style.display = 'block';
+
+        // Hide settings menu when clicking outside
+        window.addEventListener('mousedown', function hideMenu(e) {
+            if (!settingsMenu.contains(e.target)) {
+                settingsMenu.style.display = 'none';
+                window.removeEventListener('mousedown', hideMenu);
             }
         });
     }
