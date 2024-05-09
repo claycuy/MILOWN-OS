@@ -1,5 +1,193 @@
 <!DOCTYPE html>
+<html lang="en"><!DOCTYPE html>
 <html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MILOWN-OS Desktop</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+    }
+    #taskbar {
+        background-color: #4285f4;
+        color: #fff;
+        padding: 8px;
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: fit-content;
+        border-radius: 15px 15px 15px 15px;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    #taskbar .start-button {
+        background-color: #fff;
+        color: #4285f4;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .start-menu {
+        position: fixed;
+        align-items: center;
+        justify-content: center;
+        display: none;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+    }
+    .start-menu ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    .start-menu ul li {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+    }
+    .start-menu ul li:hover {
+        background-color: #f0f0f0;
+    }
+    #desktop {
+        padding: 50px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .icon {
+        width: 100px;
+        height: 100px;
+        background-color: #fff;
+        border-radius: 10px;
+        margin: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    .icon img {
+        max-width: 60%;
+        max-height: 60%;
+    }
+    .icon .close-icon {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background-color: #f00;
+        color: #fff;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+<div class="start-menu">
+    <ul>
+        <li onclick="uploadApp()">Upload App</li>
+        <li onclick="createApp('Calculator')">Calculator</li>
+        <li onclick="createApp('Notepad')">Notepad</li>
+    </ul>
+</div>
+<div id="taskbar">
+    <button onclick="startMenuBtn()" class="start-button">Start</button>
+    <span>MILOWN-OS</span>
+</div>
+
+<div id="desktop">
+    <!-- Icons will be dynamically added here -->
+</div>
+
+<input type="file" id="appUpload" style="display: none;" accept=".html" onchange="handleAppUpload(this.files)">
+
+<script>
+    let appId = 1;
+
+    function startMenuBtn() {
+        const startMenu = document.querySelector('.start-menu');
+        startMenu.style.display = 'block';
+    }
+
+    function createApp(appName) {
+        const desktop = document.getElementById('desktop');
+        const appIcon = document.createElement('div');
+        appIcon.className = 'icon';
+        appIcon.innerHTML = `
+            <img src="https://img.icons8.com/color/96/000000/${appName.toLowerCase()}.png" alt="${appName}">
+            <span class="close-icon" onclick="removeApp(this)">X</span>
+        `;
+        desktop.appendChild(appIcon);
+        saveAppToDesktop(appName);
+    }
+
+    function uploadApp() {
+        document.getElementById('appUpload').click();
+    }
+
+    function handleAppUpload(files) {
+        const appName = files[0].name.replace('.html', '');
+        createApp(appName);
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            saveAppToDesktop(appName, event.target.result);
+        };
+        reader.readAsText(files[0]);
+    }
+
+    function saveAppToDesktop(appName, appContent = '') {
+        // Create an HTML file for the app on desktop
+        const appHTML = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${appName}</title>
+            </head>
+            <body>
+            <h1>${appName}</h1>
+            ${appContent}
+            </body>
+            </html>
+        `;
+        const blob = new Blob([appHTML], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${appName}.html`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function removeApp(element) {
+        const appIcon = element.parentElement;
+        appIcon.remove();
+        // Logic to remove the corresponding app file from desktop could be added here
+    }
+</script>
+
+</body>
+</html>
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
