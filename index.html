@@ -19,11 +19,12 @@
         bottom: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 200%;
+        width: fit-content;
         border-radius: 15px 15px 15px 15px;
         z-index: 1;
         display: flex;
         justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     #taskbar .start-button {
         background-color: #fff;
@@ -32,6 +33,29 @@
         padding: 6px 12px;
         border-radius: 4px;
         cursor: pointer;
+    }
+    #taskbar .start-menu {
+        position: absolute;
+        background-color: #fff;
+        width: 200px;
+        right: 20px;
+        top: calc(100% + 10px);
+        border-radius: 10px;
+        display: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    #taskbar .start-menu ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    #taskbar .start-menu ul li {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+    }
+    #taskbar .start-menu ul li:hover {
+        background-color: #f0f0f0;
     }
     #desktop {
         padding: 50px;
@@ -60,6 +84,13 @@
 <div id="taskbar">
     <button class="start-button">Start</button>
     <span>MILOWN-OS</span>
+    <div class="start-menu">
+        <ul>
+            <li>Program 1</li>
+            <li>Program 2</li>
+            <li>Program 3</li>
+        </ul>
+    </div>
 </div>
 
 <div id="desktop">
@@ -73,6 +104,22 @@
         <img src="https://img.icons8.com/color/96/000000/notepad.png" alt="Notepad">
     </div>
 </div>
+
+<script>
+    const startButton = document.querySelector('.start-button');
+    const startMenu = document.querySelector('.start-menu');
+
+    startButton.addEventListener('click', () => {
+        startMenu.style.display = startMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close the start menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!startButton.contains(e.target) && !startMenu.contains(e.target)) {
+            startMenu.style.display = 'none';
+        }
+    });
+</script>
 
 </body>
 </html>
