@@ -34,27 +34,31 @@
         border-radius: 4px;
         cursor: pointer;
     }
-    #taskbar .start-menu {
-        position: absolute;
-        background-color: #fff;
-        width: 200px;
-        right: 20px;
-        top: calc(100% + 10px);
-        border-radius: 10px;
+    .start-menu {
+        position: fixed;
+        align-items: center;
+        justify-content: center;
         display: none;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        background-color: #fff;
+        border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 2;
     }
-    #taskbar .start-menu ul {
+    .start-menu ul {
         list-style-type: none;
         padding: 0;
         margin: 0;
     }
-    #taskbar .start-menu ul li {
+    .start-menu ul li {
         padding: 10px;
         border-bottom: 1px solid #ccc;
         cursor: pointer;
     }
-    #taskbar .start-menu ul li:hover {
+    .start-menu ul li:hover {
         background-color: #f0f0f0;
     }
     #desktop {
@@ -81,16 +85,16 @@
 </style>
 </head>
 <body>
+<div class="start-menu">
+    <ul>
+        <li>Program 1</li>
+        <li>Program 2</li>
+        <li>Program 3</li>
+    </ul>
+</div>
 <div id="taskbar">
-    <button class="start-button">Start</button>
+    <button onclick="startMenuBtn()" class="start-button">Start</button>
     <span>MILOWN-OS</span>
-    <div class="start-menu">
-        <ul>
-            <li>Program 1</li>
-            <li>Program 2</li>
-            <li>Program 3</li>
-        </ul>
-    </div>
 </div>
 
 <div id="desktop">
@@ -106,19 +110,10 @@
 </div>
 
 <script>
-    const startButton = document.querySelector('.start-button');
     const startMenu = document.querySelector('.start-menu');
-
-    startButton.addEventListener('click', () => {
-        startMenu.style.display = startMenu.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Close the start menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!startButton.contains(e.target) && !startMenu.contains(e.target)) {
-            startMenu.style.display = 'none';
-        }
-    });
+    function startMenuBtn() {
+      startMenu.style.display = 'block';
+    }
 </script>
 
 </body>
