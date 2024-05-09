@@ -78,6 +78,7 @@
         justify-content: center;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         position: relative;
+        cursor: pointer;
     }
     .icon img {
         max-width: 60%;
@@ -142,8 +143,10 @@
             <img src="https://img.icons8.com/color/96/000000/${appName.toLowerCase()}.png" alt="${appName}">
             <span class="close-icon" onclick="removeApp(this)">X</span>
         `;
+        appIcon.addEventListener('click', function() {
+            openApp(appName);
+        });
         desktop.appendChild(appIcon);
-        saveAppToDesktop(appName);
     }
 
     function uploadApp() {
@@ -161,39 +164,34 @@
     }
 
     function saveAppToDesktop(appName, appContent = '') {
-        // Create an HTML file for the app on desktop
-        const appHTML = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${appName}</title>
-            </head>
-            <body>
-            <h1>${appName}</h1>
-            ${appContent}
-            </body>
-            </html>
-        `;
-        const blob = new Blob([appHTML], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${appName}.html`;
-        a.click();
-        URL.revokeObjectURL(url);
-
         // Save app to localStorage
         const savedApps = JSON.parse(localStorage.getItem('desktopApps')) || [];
-        savedApps.push(appName);
+        savedApps.push({ name: appName, content: appContent });
         localStorage.setItem('desktopApps', JSON.stringify(savedApps));
+    }
+
+    function openApp(appName) {
+        const app = getAppFromLocalStorage(appName);
+        if (app) {
+            const appWindow = window.open('', '_blank');
+            appWindow.document.write(app.content);
+            appWindow.document.close();
+        }
+    }
+
+    function getAppFromLocalStorage(appName) {
+        const savedApps = JSON.parse(localStorage.getItem('desktopApps')) || [];
+        return savedApps.find(app => app.name === appName);
     }
 
     function removeApp(element) {
         const appIcon = element.parentElement;
         appIcon.remove();
-        // Logic to remove the corresponding app file from desktop and localStorage could be added here
+        // Remove app from localStorage
+        const appName = appIcon.querySelector('img').alt;
+        const savedApps = JSON.parse(localStorage.getItem('desktopApps')) || [];
+        const updatedApps = savedApps.filter(app => app.name !== appName);
+        localStorage.setItem('desktopApps', JSON.stringify(updatedApps));
     }
 </script>
 
