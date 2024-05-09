@@ -120,13 +120,11 @@
 <input type="file" id="appUpload" style="display: none;" accept=".html" onchange="handleAppUpload(this.files)">
 
 <script>
-    let appId = 1;
-
     window.onload = function() {
         // Load apps from localStorage on page load
         const savedApps = JSON.parse(localStorage.getItem('desktopApps'));
         if (savedApps) {
-            savedApps.forEach(app => createApp(app));
+            savedApps.forEach(app => createApp(app.name));
         }
     };
 
@@ -155,15 +153,16 @@
 
     function handleAppUpload(files) {
         const appName = files[0].name.replace('.html', '');
-        createApp(appName);
         const reader = new FileReader();
         reader.onload = function(event) {
-            saveAppToDesktop(appName, event.target.result);
+            const appContent = event.target.result;
+            saveAppToDesktop(appName, appContent);
+            createApp(appName);
         };
         reader.readAsText(files[0]);
     }
 
-    function saveAppToDesktop(appName, appContent = '') {
+    function saveAppToDesktop(appName, appContent) {
         // Save app to localStorage
         const savedApps = JSON.parse(localStorage.getItem('desktopApps')) || [];
         savedApps.push({ name: appName, content: appContent });
@@ -187,7 +186,6 @@
     function removeApp(element) {
         const appIcon = element.parentElement;
         appIcon.remove();
-        // Remove app from localStorage
         const appName = appIcon.querySelector('img').alt;
         const savedApps = JSON.parse(localStorage.getItem('desktopApps')) || [];
         const updatedApps = savedApps.filter(app => app.name !== appName);
