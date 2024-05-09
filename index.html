@@ -98,6 +98,27 @@
         justify-content: center;
         cursor: pointer;
     }
+    .context-menu {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 3;
+        display: none;
+    }
+    .context-menu ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    .context-menu ul li {
+        padding: 8px 16px;
+        cursor: pointer;
+    }
+    .context-menu ul li:hover {
+        background-color: #f0f0f0;
+    }
 </style>
 </head>
 <body>
@@ -118,6 +139,13 @@
 </div>
 
 <input type="file" id="appUpload" style="display: none;" accept=".html" onchange="handleAppUpload(this.files)">
+
+<div id="contextMenu" class="context-menu">
+    <ul>
+        <li onclick="showContextMenu(event, 'Open')">Open</li>
+        <li onclick="showContextMenu(event, 'Delete')">Delete</li>
+    </ul>
+</div>
 
 <script>
     window.onload = function() {
@@ -141,8 +169,11 @@
             <img src="https://img.icons8.com/color/96/000000/${appName.toLowerCase()}.png" alt="${appName}">
             <span class="close-icon" onclick="removeApp(this)">X</span>
         `;
-        appIcon.addEventListener('click', function() {
-            openApp(appName);
+        appIcon.addEventListener('click', function(event) {
+            openApp(event, appName);
+        });
+        appIcon.addEventListener('contextmenu', function(event) {
+            showContextMenu(event, appName);
         });
         desktop.appendChild(appIcon);
     }
@@ -169,7 +200,8 @@
         localStorage.setItem('desktopApps', JSON.stringify(savedApps));
     }
 
-    function openApp(appName) {
+    function openApp(event, appName) {
+        event.preventDefault();
         const app = getAppFromLocalStorage(appName);
         if (app) {
             const appWindow = window.open('', '_blank');
@@ -190,6 +222,48 @@
         const savedApps = JSON.parse(localStorage.getItem('desktopApps')) || [];
         const updatedApps = savedApps.filter(app => app.name !== appName);
         localStorage.setItem('desktopApps', JSON.stringify(updatedApps));
+    }
+
+    function showContextMenu(event, appName) {
+        event.preventDefault();
+        const contextMenu = document.getElementById('contextMenu');
+        contextMenu.style.left = `${event.clientX}px`;
+        contextMenu.style.top = `${event.clientY}px`;
+        contextMenu.style.display = 'block';
+
+        // Define actions for context menu items
+        const menuItems = contextMenu.querySelectorAll('li');
+        menuItems.forEach(item => {
+            item.onclick = () => {
+                contextMenu.style.display = 'none';
+                if (item.innerText === 'Open') {
+                    openApp(event, appName);
+                } else if (item.innerText === 'Delete') {
+                    removeAppByName(appName);
+                }
+            };
+        });
+
+        // Hide context menu when clicking outside
+        window.addEventListener('mousedown', function hideMenu(e) {
+            if (!contextMenu.contains(e.target)) {
+                contextMenu.style.display = 'none';
+                window.removeEventListener('mousedown', hideMenu);
+            }
+        });
+    }
+
+    function removeAppByName(appName) {
+        const savedApps = JSON.parse(localStorage.getItem('desktopApps')) || [];
+        const updatedApps = savedApps.filter(app => app.name !== appName);
+        localStorage.setItem('desktopApps', JSON.stringify(updatedApps));
+
+        const desktopIcons = document.querySelectorAll('.icon');
+        desktopIcons.forEach(icon => {
+            if (icon.querySelector('img').alt === appName) {
+                icon.remove();
+            }
+        });
     }
 </script>
 
